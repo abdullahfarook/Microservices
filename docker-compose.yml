@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+
+  sqlserver:
+    container_name: sqlserver
+    image: abdullahgb/mssql:latest
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+
+  identity.api:
+    container_name: identity_api
+    image: ${REGISTRY:-microservice}/identity.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Identity.Api/Dockerfile    
+    depends_on:
+      - sqlserver
+      - rabbitmq
+
+  payment.api:
+    container_name: payment_api
+    image: ${REGISTRY:-microservice}/payment.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Payment.Api/Dockerfile
+    depends_on:
+      - sqlserver
+      - rabbitmq  

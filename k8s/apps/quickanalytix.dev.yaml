@@ -1,0 +1,80 @@
+# Default values for productsstore.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+namespace: quickanalytix-namespace
+registry: abdullahgb
+tag: latest
+event_bus: Endpoint=sb://eventbusdev.servicebus.windows.net/;SharedAccessKeyName=manage;SharedAccessKey=i9vi/ZMEoN++mxKAIM342v2Ok4gL4XYpoFkDmZjxVoI=;EntityPath=quickanalytixeventbusdev
+db_server: Server=quickanalytixdev.database.windows.net;User=quickanalytixdev;Password=P@kistan7861;Database=
+
+gw:
+  name: gateway
+  buildId: 1 # will be incremented in the CI/CD
+  image:
+    dockerHubId: abdullahgb
+    name: gateway
+    tag: latest
+    replicaCount: 1
+  port: 5000
+
+identity:
+  name: identity
+  buildId: 1 # will be incremented in the CI/CD
+  db_name: IdentityDB;
+  image:
+    dockerHubId: brickclaycontainerregistry.azurecr.io
+    name: identity.api
+    tag: latest
+    replicaCount: 1
+  port: 5001
+
+mail:
+  name: mail
+  buildId: 1 # will be incremented in the CI/CD
+  image:
+    dockerHubId: brickclaycontainerregistry.azurecr.io
+    name: mail
+    tag: latest
+    replicaCount: 1
+  port: 5003
+
+payment:
+  name: payment
+  buildId: 1 # will be incremented in the CI/CD
+  db_name: PaymentDB;
+  image:
+    dockerHubId: brickclaycontainerregistry.azurecr.io
+    name: payment.api
+    tag: latest
+    replicaCount: 1
+  port: 5002
+
+powerbi:
+  name: powerbi
+  buildId: 1 # will be incremented in the CI/CD
+  db_name: PowerBiDB;
+  image:
+    dockerHubId: brickclaycontainerregistry.azurecr.io
+    name: powerbi.api
+    tag: latest
+    replicaCount: 1
+  port: 5004
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

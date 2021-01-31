@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.powerbi.name }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.powerbi.name }}
+  replicas: 1 # t ells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.powerbi.name }}
+    spec:
+      containers:
+        - name: {{ .Values.powerbi.name }}
+          image: {{ .Values.powerbi.image.dockerHubId }}/{{ .Values.powerbi.image.name }}:{{ .Values.powerbi.image.tag }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: ConnectionStrings__DatabaseConnection
+              value: {{ .Values.db_server }}{{ .Values.powerbi.db_name }}  
+            - name: EventBus__SubscriptionClientName
+              value: {{ .Values.powerbi.name }}
+            - name: EventBus__Connection
+              value: {{ .Values.event_bus }}
+            - name: AzureServiceBusEnabled
+              value: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.powerbi.name }}-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.powerbi.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.powerbi.port }}
+      targetPort: 80
+  type: LoadBalancer

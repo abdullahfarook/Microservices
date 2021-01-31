@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.identity.name }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.identity.name }}
+  replicas: 1 # t ells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.identity.name }}
+    spec:
+      containers:
+        - name: {{ .Values.identity.name }}
+          imagePullPolicy: Always
+          image: {{ .Values.identity.image.dockerHubId }}/{{ .Values.identity.image.name }}:{{ .Values.identity.image.tag }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: ConnectionStrings__DatabaseConnection
+              value: {{ .Values.db_server }}{{ .Values.identity.db_name }}  
+            - name: EventBus__SubscriptionClientName
+              value: {{ .Values.identity.name }}
+            - name: EventBus__Connection
+              value: {{ .Values.event_bus }}
+            - name: AzureServiceBusEnabled
+              value: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.identity.name }}-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.identity.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.identity.port }}
+      targetPort: 80
+  type: LoadBalancer

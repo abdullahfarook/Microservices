@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.mail.name }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.mail.name }}
+  replicas: 1 # t ells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mail.name }}
+    spec:
+      containers:
+        - name: {{ .Values.mail.name }}
+          image: {{ .Values.mail.image.dockerHubId }}/{{ .Values.mail.image.name }}:{{ .Values.mail.image.tag }}
+          ports:
+            - containerPort: 80
+          env: 
+            - name: EventBus__SubscriptionClientName
+              value: {{ .Values.mail.name }}
+            - name: EventBus__Connection
+              value: {{ .Values.event_bus }}
+            - name: AzureServiceBusEnabled
+              value: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.mail.name }}-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.mail.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.mail.port }}
+      targetPort: 80
+  type: LoadBalancer

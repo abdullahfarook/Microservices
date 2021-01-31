@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.payment.name }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.payment.name }}
+  replicas: 1 # t ells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.payment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.payment.name }}
+          image: {{ .Values.payment.image.dockerHubId }}/{{ .Values.payment.image.name }}:{{ .Values.payment.image.tag }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: ConnectionStrings__DatabaseConnection
+              value: {{ .Values.db_server }}{{ .Values.payment.db_name }}  
+            - name: EventBus__SubscriptionClientName
+              value: {{ .Values.payment.name }}
+            - name: EventBus__Connection
+              value: {{ .Values.event_bus }}
+            - name: AzureServiceBusEnabled
+              value: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.payment.name }}-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.payment.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.payment.port }}
+      targetPort: 80
+  type: LoadBalancer

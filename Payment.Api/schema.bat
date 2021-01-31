@@ -1,0 +1,1 @@
+dotnet ef dbcontext scaffold "Server=localhost,1433;Initial Catalog=FrameworkDb Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;User Id=sa; Password=123;" Microsoft.EntityFrameworkCore.SqlServer -o ./DataAccess/Model --context-dir ./DataAccess --context IcoonsContext --force

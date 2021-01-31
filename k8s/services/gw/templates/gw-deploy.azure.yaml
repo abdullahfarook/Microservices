@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.gw.name }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.gw.name }}
+  replicas: 1 # t ells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      name: {{ .Values.gw.name }}
+      labels:
+        app: {{ .Values.gw.name }}
+    spec:
+      containers:
+        - name: {{ .Values.gw.name }}
+          image: {{ .Values.gw.image.dockerHubId }}/{{ .Values.gw.image.name }}:{{ .Values.gw.image.tag }}
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.gw.name }}-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.gw.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.gw.port }}
+      targetPort: 80
+  type: LoadBalancer

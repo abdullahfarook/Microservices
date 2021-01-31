@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: quickanalytix-proxy
+  namespace: quickanalytix-namespace
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+    - host: api.f18b16b2240b45849be9.eastasia.aksapp.io
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: gateway-service
+              servicePort: 5000
+          - path: /identity
+            backend:
+              serviceName: identity-service
+              servicePort: 5001
+          - path: /payment
+            backend:
+              serviceName: payment-service
+              servicePort: 5002
